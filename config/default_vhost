@@ -1,0 +1,27 @@
+server {
+    listen 80;
+    root /home/pico/public_html;
+    index index.php index.html;
+ 
+    # Main declaration
+    location / {
+        index /index.php;
+        port_in_redirect off;
+        try_files $uri $uri/ /index.php?url=$uri&$args;
+    }
+
+    # PHP controller
+    location ~ ^(.*?\.php)(/.*)?$ {
+        fastcgi_split_path_info ^(.+?\.php)(/.+)$;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+
+        try_files $uri =404;
+        fastcgi_pass 127.0.0.1:9090;
+
+        fastcgi_index index.php;
+        fastcgi_buffer_size 32k;
+        fastcgi_buffers 4 32k;
+        fastcgi_busy_buffers_size 64k;
+    }
+}
